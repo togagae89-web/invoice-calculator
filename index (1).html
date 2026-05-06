@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Late Invoice Cost Calculator — Free Tool</title>
+<meta name="description" content="Find out how much your overdue invoices are really costing you in lost interest and wasted time. Free calculator for small businesses.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  :root{
+    --ink:#0f0f0f;
+    --paper:#f5f0e8;
+    --accent:#d4401a;
+    --accent2:#1a6e4a;
+    --muted:#7a7060;
+    --border:#c8bfa8;
+    --card:#fffdf7;
+  }
+
+  body{
+    font-family:'Syne',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+  }
+
+  .hero{
+    background:var(--ink);
+    color:var(--paper);
+    padding:60px 40px 48px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .hero::before{
+    content:'$';
+    position:absolute;
+    right:-20px;top:-40px;
+    font-size:320px;
+    font-weight:800;
+    color:rgba(255,255,255,0.04);
+    line-height:1;
+    pointer-events:none;
+    font-family:'Syne',sans-serif;
+  }
+
+  .badge{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border-radius:2px;
+    margin-bottom:20px;
+  }
+
+  .hero h1{
+    font-size:clamp(30px,5vw,52px);
+    font-weight:800;
+    line-height:1.1;
+    max-width:560px;
+    margin-bottom:14px;
+  }
+
+  .hero h1 em{
+    color:var(--accent);
+    font-style:normal;
+  }
+
+  .hero p{
+    font-size:16px;
+    color:rgba(245,240,232,0.65);
+    max-width:440px;
+    line-height:1.6;
+    font-weight:400;
+  }
+
+  .main{
+    padding:48px 40px;
+    max-width:720px;
+    margin:0 auto;
+  }
+
+  .section-label{
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:20px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  .col-headers{
+    display:grid;
+    grid-template-columns:1fr 140px 130px 36px;
+    gap:10px;
+    margin-bottom:8px;
+    padding:0 2px;
+  }
+  .col-headers span{
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .invoice-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:16px;
+  }
+
+  .invoice-row{
+    display:grid;
+    grid-template-columns:1fr 140px 130px 36px;
+    gap:10px;
+    align-items:center;
+    animation:slideIn .25s ease;
+  }
+
+  @keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+  .invoice-row input{
+    font-family:'DM Mono',monospace;
+    font-size:13px;
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:6px;
+    padding:11px 12px;
+    color:var(--ink);
+    outline:none;
+    width:100%;
+    transition:border-color .15s;
+  }
+
+  .invoice-row input:focus{border-color:var(--accent);}
+  .invoice-row input::placeholder{color:var(--muted);}
+
+  .remove-btn{
+    background:none;
+    border:1.5px solid var(--border);
+    border-radius:6px;
+    width:36px;height:42px;
+    cursor:pointer;
+    color:var(--muted);
+    font-size:20px;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s;
+    flex-shrink:0;
+    line-height:1;
+  }
+  .remove-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  .add-btn{
+    background:none;
+    border:1.5px dashed var(--border);
+    border-radius:8px;
+    padding:13px;
+    width:100%;
+    cursor:pointer;
+    font-family:'Syne',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:var(--muted);
+    letter-spacing:.05em;
+    transition:all .2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    margin-bottom:32px;
+  }
+  .add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(212,64,26,0.04);}
+
+  .rate-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:32px;
+  }
+
+  .field-group label{
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:block;
+    margin-bottom:8px;
+  }
+
+  .field-group input{
+    font-family:'DM Mono',monospace;
+    font-size:14px;
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:6px;
+    padding:12px 14px;
+    color:var(--ink);
+    outline:none;
+    width:100%;
+    transition:border-color .15s;
+  }
+  .field-group input:focus{border-color:var(--accent);}
+
+  .calc-btn{
+    width:100%;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:18px;
+    font-family:'Syne',sans-serif;
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:.04em;
+    cursor:pointer;
+    transition:all .2s;
+  }
+  .calc-btn:hover{background:#b83515;transform:translateY(-1px);}
+  .calc-btn:active{transform:translateY(0);}
+
+  .results{
+    margin-top:40px;
+    display:none;
+  }
+  .results.visible{display:block;}
+
+  .results-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:20px;
+  }
+
+  .result-card{
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:24px 20px;
+  }
+
+  .result-card.danger{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--paper);
+    grid-column:1/-1;
+  }
+
+  .result-card .label{
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+
+  .result-card.danger .label{color:rgba(245,240,232,0.5);}
+
+  .result-card .value{
+    font-size:34px;
+    font-weight:800;
+    line-height:1;
+  }
+
+  .result-card .sub{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:8px;
+    font-weight:400;
+  }
+
+  .result-card.danger .value{color:var(--accent);}
+  .result-card.danger .sub{color:rgba(245,240,232,0.5);}
+  .result-card.good .value{color:var(--accent2);}
+
+  .invoice-breakdown{
+    background:var(--card);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:24px;
+  }
+
+  .breakdown-header{
+    display:grid;
+    grid-template-columns:1fr 110px 110px 120px;
+    gap:10px;
+    padding:13px 20px;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  .breakdown-row{
+    display:grid;
+    grid-template-columns:1fr 110px 110px 120px;
+    gap:10px;
+    padding:15px 20px;
+    border-bottom:1px solid var(--border);
+    font-family:'DM Mono',monospace;
+    font-size:13px;
+    align-items:center;
+    transition:background .15s;
+  }
+  .breakdown-row:last-child{border-bottom:none;}
+  .breakdown-row:hover{background:rgba(212,64,26,0.04);}
+  .breakdown-row .interest{color:var(--accent);font-weight:500;}
+  .breakdown-row .client-name{font-weight:700;font-family:'Syne',sans-serif;font-size:13px;}
+
+  .overdue-tag{
+    display:inline-block;
+    font-size:10px;
+    padding:2px 7px;
+    border-radius:3px;
+    font-family:'DM Mono',monospace;
+    font-weight:500;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .overdue-tag.high{background:rgba(212,64,26,0.12);color:var(--accent);}
+  .overdue-tag.med{background:rgba(186,117,23,0.12);color:#854F0B;}
+  .overdue-tag.low{background:rgba(26,110,74,0.1);color:var(--accent2);}
+
+  .cta-box{
+    background:var(--accent);
+    color:#fff;
+    border-radius:12px;
+    padding:36px 32px;
+    display:flex;
+    align-items:center;
+    gap:28px;
+  }
+  .cta-box .cta-text h3{font-size:22px;font-weight:800;margin-bottom:8px;}
+  .cta-box .cta-text p{font-size:14px;opacity:.85;line-height:1.6;max-width:340px;}
+
+  .cta-link{
+    flex-shrink:0;
+    background:#fff;
+    color:var(--accent);
+    text-decoration:none;
+    padding:14px 26px;
+    border-radius:8px;
+    font-weight:800;
+    font-size:15px;
+    white-space:nowrap;
+    transition:all .2s;
+    font-family:'Syne',sans-serif;
+  }
+  .cta-link:hover{background:var(--ink);color:#fff;}
+
+  footer{
+    text-align:center;
+    padding:40px;
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    border-top:1px solid var(--border);
+    margin-top:60px;
+  }
+
+  @media(max-width:600px){
+    .hero{padding:40px 24px 36px;}
+    .main{padding:32px 20px;}
+    .col-headers,.invoice-row{grid-template-columns:1fr 110px 36px;}
+    .col-headers span:nth-child(3),.invoice-row .days-field{display:none;}
+    .rate-row{grid-template-columns:1fr;}
+    .results-grid{grid-template-columns:1fr;}
+    .result-card.danger{grid-column:1;}
+    .breakdown-header,.breakdown-row{grid-template-columns:1fr 90px 100px;}
+    .breakdown-header span:nth-child(2),.breakdown-row span:nth-child(2){display:none;}
+    .cta-box{flex-direction:column;gap:18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">Free tool for small businesses</div>
+  <h1>How much are your <em>late invoices</em> really costing you?</h1>
+  <p>Enter your overdue invoices below. We'll calculate the true cost in lost cash flow, interest charges, and the value of your time spent chasing.</p>
+</div>
+
+<div class="main">
+
+  <div class="section-label">Your overdue invoices</div>
+
+  <div class="col-headers">
+    <span>Client name</span>
+    <span>Amount ($)</span>
+    <span>Days overdue</span>
+    <span></span>
+  </div>
+
+  <div class="invoice-list" id="invoiceList"></div>
+
+  <button class="add-btn" onclick="addInvoice()">+ Add another invoice</button>
+
+  <div class="section-label">Your details</div>
+
+  <div class="rate-row">
+    <div class="field-group">
+      <label>Your hourly rate ($/hr)</label>
+      <input type="number" id="hourlyRate" value="75" min="1" placeholder="75">
+    </div>
+    <div class="field-group">
+      <label>Annual interest rate (%)</label>
+      <input type="number" id="interestRate" value="8" min="0" max="30" step="0.5" placeholder="8">
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calculate()">Calculate the true cost →</button>
+
+  <div class="results" id="results">
+    <div style="height:40px"></div>
+    <div class="section-label">Your results</div>
+    <div class="results-grid" id="resultsGrid"></div>
+    <div class="invoice-breakdown" id="breakdown"></div>
+    <div class="cta-box">
+      <div class="cta-text">
+        <h3>Stop chasing. Start getting paid.</h3>
+        <p>Invoice Chaser sends automatic reminders so you never have to follow up on a late invoice manually again.</p>
+      </div>
+      <a href="YOUR-SIGNUP-LINK-HERE" class="cta-link">Try it free →</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Built by Invoice Chaser &nbsp;·&nbsp; Free tool, no sign-up required
+</footer>
+
+<script>
+let invoices = [];
+let idCounter = 0;
+
+function addInvoice(name, amount, days) {
+  const id = idCounter++;
+  invoices.push({ id });
+  const list = document.getElementById('invoiceList');
+  const row = document.createElement('div');
+  row.className = 'invoice-row';
+  row.id = 'row-' + id;
+  row.innerHTML = `
+    <input type="text" placeholder="e.g. Smith Plumbing" value="${name||''}" oninput="updateInvoice(${id},'name',this.value)">
+    <input type="number" placeholder="0.00" value="${amount||''}" min="0" step="0.01" oninput="updateInvoice(${id},'amount',this.value)">
+    <input type="number" placeholder="30" value="${days||''}" min="1" oninput="updateInvoice(${id},'days',this.value)" class="days-field">
+    <button class="remove-btn" onclick="removeInvoice(${id})" aria-label="Remove invoice">×</button>
+  `;
+  list.appendChild(row);
+}
+
+function updateInvoice(id, field, value) {
+  const inv = invoices.find(i => i.id === id);
+  if (inv) inv[field] = value;
+}
+
+function removeInvoice(id) {
+  invoices = invoices.filter(i => i.id !== id);
+  const row = document.getElementById('row-' + id);
+  if (row) {
+    row.style.transition = 'all .2s';
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(-10px)';
+    setTimeout(() => row.remove(), 200);
+  }
+}
+
+function fmt(n) {
+  return new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(n);
+}
+
+function calculate() {
+  const hourly = parseFloat(document.getElementById('hourlyRate').value) || 75;
+  const annualRate = parseFloat(document.getElementById('interestRate').value) || 8;
+  const dailyRate = annualRate / 100 / 365;
+
+  const rows = document.querySelectorAll('.invoice-row[id]');
+  const data = [];
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const name = inputs[0].value.trim() || 'Unknown client';
+    const amount = parseFloat(inputs[1].value) || 0;
+    const days = parseInt(inputs[2].value) || 30;
+    if (amount > 0) data.push({ name, amount, days });
+  });
+
+  if (data.length === 0) {
+    alert('Please add at least one invoice with an amount.');
+    return;
+  }
+
+  const totalOwed = data.reduce((s, i) => s + i.amount, 0);
+  const totalInterest = data.reduce((s, i) => s + (i.amount * dailyRate * i.days), 0);
+  const chaseHours = data.length * 2.5;
+  const chaseCost = chaseHours * hourly;
+  const totalLost = totalInterest + chaseCost;
+  const avgDays = Math.round(data.reduce((s, i) => s + i.days, 0) / data.length);
+
+  document.getElementById('resultsGrid').innerHTML = `
+    <div class="result-card danger">
+      <div class="label">Total you're owed</div>
+      <div class="value">${fmt(totalOwed)}</div>
+      <div class="sub">${data.length} invoice${data.length !== 1 ? 's' : ''} &nbsp;·&nbsp; avg ${avgDays} days overdue</div>
+    </div>
+    <div class="result-card">
+      <div class="label">Lost in interest</div>
+      <div class="value">${fmt(totalInterest)}</div>
+      <div class="sub">At ${annualRate}% annual rate</div>
+    </div>
+    <div class="result-card">
+      <div class="label">Your time wasted</div>
+      <div class="value">${fmt(chaseCost)}</div>
+      <div class="sub">${chaseHours.toFixed(1)} hrs chasing @ ${fmt(hourly)}/hr</div>
+    </div>
+    <div class="result-card ${totalLost > 500 ? 'danger' : 'good'}">
+      <div class="label">Total hidden cost</div>
+      <div class="value">${fmt(totalLost)}</div>
+      <div class="sub">Interest + time combined</div>
+    </div>
+  `;
+
+  const bdRows = data.map(inv => {
+    const interest = inv.amount * dailyRate * inv.days;
+    const chase = hourly * 2.5;
+    const total = interest + chase;
+    const tag = inv.days > 60 ? 'high' : inv.days > 30 ? 'med' : 'low';
+    const label = inv.days > 60 ? 'Critical' : inv.days > 30 ? 'Urgent' : 'Overdue';
+    return `
+      <div class="breakdown-row">
+        <span class="client-name">${inv.name}<span class="overdue-tag ${tag}">${label}</span></span>
+        <span>${fmt(inv.amount)}</span>
+        <span>${inv.days} days</span>
+        <span class="interest">${fmt(total)}</span>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('breakdown').innerHTML = `
+    <div class="breakdown-header">
+      <span>Client</span>
+      <span>Amount</span>
+      <span>Days late</span>
+      <span>Hidden cost</span>
+    </div>
+    ${bdRows}
+  `;
+
+  const results = document.getElementById('results');
+  results.classList.add('visible');
+  setTimeout(() => results.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+addInvoice('Smith Plumbing', '3200', '47');
+addInvoice('Green Cafe', '1850', '62');
+</script>
+</body>
+</html>
